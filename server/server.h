@@ -15,7 +15,6 @@
 
 #define MAX_BUFFER_LEN 1024
 #define SERVER_PORT 55555
-#define SLA 500
 
 void start_server();
 

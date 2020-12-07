@@ -3,17 +3,15 @@
 void start_server() {
 
     fd_set active_fd_set, read_fd_set;
-    // Server variables
+
     int serverSocket;
     struct sockaddr_in serverAddress;
 
-    // Client that connects variables
     int clientSocket;
     struct sockaddr_in clientAddress;
     socklen_t clientAddressLength;
 
-    // Operation data
-    char buffer[MAX_BUFFER_LEN];
+    char buffer[1024];
     int serverRequestLength;
     int serverResponseLength;
 
@@ -51,7 +49,7 @@ void start_server() {
 
     if (startListeningStatus < 0) 
     {
-        perror("Failed to start listening to clients");
+        perror("Error starting to listen");
         exit(3);
     }
 
@@ -83,11 +81,11 @@ void start_server() {
                               (struct sockaddr *) &clientAddress,
                               &clientAddressLength);
                 if (new < 0){
-                    perror ("accept");
+                    perror ("Accept error");
                     exit (EXIT_FAILURE);
                 }
                 fprintf (stderr,
-                    "Server: connect from host %s, port %hd.\n",
+                    "Server: connection accepted from host %s, port %d.\n",
                     inet_ntoa (clientAddress.sin_addr),
                     ntohs (clientAddress.sin_port));
                 FD_SET (new, &active_fd_set);
@@ -116,11 +114,7 @@ void start_server() {
                     char *timeString = calloc(MAX_BUFFER_LEN, sizeof(char));
                     get_time(timeString, MAX_BUFFER_LEN);
 
-                    serverResponseLength = send(
-                        clientSocket,
-                        timeString,
-                        strlen(timeString),
-                        0);
+                    serverResponseLength = send(clientSocket, timeString, strlen(timeString), 0);
 
                     // Print status
                     printf(
