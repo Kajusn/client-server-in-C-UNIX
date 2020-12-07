@@ -61,6 +61,5 @@ void start_client() {
       0);             // Flags
   memset(buffer, 0, sizeof(buffer));
 
-  // Finishing
   close(serverSocket);
 }

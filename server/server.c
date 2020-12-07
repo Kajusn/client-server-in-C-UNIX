@@ -65,7 +65,6 @@ void start_server() {
             exit (EXIT_FAILURE);
         }
 
-        // Refreshing buffer and client's address
         memset(&buffer, 0, sizeof(buffer));
         memset(&clientAddress, 0, sizeof(clientAddress));
 
