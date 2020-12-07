@@ -2,14 +2,11 @@
 
 void start_client() {
 
-  // Server parameters
   int serverSocket;
   struct sockaddr_in serverAddress;
 
-  // Operation data
   char buffer[MAX_BUFFER_LEN];
 
-  // Initializing server socket
   serverSocket = socket(
     AF_INET,     // IPv4 internet protocols
     SOCK_STREAM, // Sequenced, reliable, two-way connection-based byte streams
@@ -37,7 +34,6 @@ void start_client() {
     exit(1);
   }
 
-  // Asking server to receive time
   strcpy(buffer, "time-request");
   send(
     serverSocket,   // Socket to send to
@@ -46,13 +42,23 @@ void start_client() {
     0);             // Flags
   memset(buffer, 0, sizeof(buffer));
 
-  // Getting the time and printing it out
   recv(
     serverSocket,   // Socket to receive from
     buffer,         // Buffer to which the response is written
     MAX_BUFFER_LEN, // The amount of letters read as response
     0);             // Flags
   printf("\n\nThe server time is: %s\n", buffer);
+  memset(buffer, 0, sizeof(buffer));
+
+  sleep(7);
+
+  strcpy(buffer, "disconnect");
+  send(
+    serverSocket,   // Socket to send to
+    buffer,         // Buffer which is sent
+    strlen(buffer), // Amount of letters being sent
+    0);             // Flags
+  memset(buffer, 0, sizeof(buffer));
 
   // Finishing
   close(serverSocket);

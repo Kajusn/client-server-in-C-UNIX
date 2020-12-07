@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 #define MAX_BUFFER_LEN 1024
-#define SERVER_PORT 65000
+#define SERVER_PORT 55555
 
 void start_client();
 

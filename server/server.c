@@ -40,7 +40,8 @@ void start_server() {
         (struct sockaddr *) &serverAddress,
         sizeof(serverAddress));
 
-    if (bindStatus < 0) {
+    if (bindStatus < 0) 
+    {
         perror("Failed to bind server's address to server's socket");
         exit(2);
     }
@@ -48,18 +49,20 @@ void start_server() {
     // Starting to listen to clients to connect
     int startListeningStatus = listen(serverSocket, 1);
 
-    if (startListeningStatus < 0) {
+    if (startListeningStatus < 0) 
+    {
         perror("Failed to start listening to clients");
         exit(3);
     }
 
     FD_ZERO (&active_fd_set);
     FD_SET (serverSocket, &active_fd_set);
-    // Entering the app lifecycle loop
+
     while (1) {
 
         read_fd_set = active_fd_set;
-        if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
+        if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) 
+        {
             perror ("select");
             exit (EXIT_FAILURE);
         }
@@ -68,15 +71,14 @@ void start_server() {
         memset(&buffer, 0, sizeof(buffer));
         memset(&clientAddress, 0, sizeof(clientAddress));
 
-
-
         for (int i = 0; i < FD_SETSIZE; ++i)
         if (FD_ISSET (i, &read_fd_set))
-          {
+        {
             if (i == serverSocket)
-              {
+            {
                 /* Connection request on original socket. */
                 int new;
+                clientAddressLength = sizeof(clientAddress);
                 new = accept (serverSocket,
                               (struct sockaddr *) &clientAddress,
                               &clientAddressLength);
@@ -89,36 +91,44 @@ void start_server() {
                     inet_ntoa (clientAddress.sin_addr),
                     ntohs (clientAddress.sin_port));
                 FD_SET (new, &active_fd_set);
-              }
+            }
             else
-              {
+            {
                 /* Data arriving on an already-connected socket. */
                 clientSocket = i;
                 // Once connection has been received, reading input
                 serverRequestLength = recv(clientSocket, buffer, sizeof(buffer), 0);
 
-                // Process the received message
-                char *timeString = calloc(MAX_BUFFER_LEN, sizeof(char));
-                get_time(timeString, MAX_BUFFER_LEN);
+                if (!strncmp(buffer, "disconnect", 10)) 
+                {
+                    // Disconnecting from the clientSocket
+                    close(clientSocket);
+                    FD_CLR (clientSocket, &active_fd_set);
+                    // Print status
+                    printf(
+                        "got: %d - sent: %d\n",
+                        serverRequestLength,
+                        serverResponseLength);
 
-                // Sending back the same what was sent
-                serverResponseLength = send(
-                    clientSocket,
-                    timeString,
-                    strlen(timeString),
-                    0);
+                } else if (!strncmp(buffer, "time-request", 12)) 
+                {
+                    // Process the received message
+                    char *timeString = calloc(MAX_BUFFER_LEN, sizeof(char));
+                    get_time(timeString, MAX_BUFFER_LEN);
 
-                // Disconnecting from the clientSocket
-                close(clientSocket);
-                FD_CLR (clientSocket, &active_fd_set);
+                    serverResponseLength = send(
+                        clientSocket,
+                        timeString,
+                        strlen(timeString),
+                        0);
 
-                // Printing status
-                printf(
-                    "%s - got: %d - sent: %d\n",
-                    inet_ntoa(clientAddress.sin_addr),
-                    serverRequestLength,
-                    serverResponseLength);
-              }
-          }
+                    // Print status
+                    printf(
+                        "got: %d - sent: %d\n",
+                        serverRequestLength,
+                        serverResponseLength);
+                }
+            }
+        }
     }
 }
