@@ -2,17 +2,17 @@
 
 void start_client() {
 
-  int serverSocket;
+  int clientSocket;
   struct sockaddr_in serverAddress;
 
   char buffer[1024];
 
-  serverSocket = socket(
+  clientSocket = socket(
       AF_INET,     // IPv4 internet protocol
       SOCK_STREAM, // Sequenced, reliable, two-way connection-based byte streams
       0);          // Default protocol
 
-  if (serverSocket < 0) {
+  if (clientSocket < 0) {
       perror("Failed to initialize server socket");
       exit(1);
   }
@@ -25,7 +25,7 @@ void start_client() {
 
   // Connecting to the server
   int connectStatus = connect(
-      serverSocket,
+      clientSocket,
       (struct sockaddr*) &serverAddress,
       sizeof(serverAddress));
 
@@ -36,14 +36,14 @@ void start_client() {
 
   strcpy(buffer, "time-request");
   send(
-      serverSocket,   // Socket to send to
+      clientSocket,   // Socket to send to
       buffer,         // Buffer which is sent
       strlen(buffer), // Amount of bytes being sent
       0);             // Flags
   memset(buffer, 0, sizeof(buffer));
 
   recv(
-      serverSocket,   // Socket to receive from
+      clientSocket,   // Socket to receive from
       buffer,         // Buffer to which the response is written
       MAX_BUFFER_LEN, // The amount of bytes read as response
       0);             // Flags
@@ -55,11 +55,11 @@ void start_client() {
 
   strcpy(buffer, "disconnect");
   send(
-      serverSocket,   // Socket to send to
+      clientSocket,   // Socket to send to
       buffer,         // Buffer which is sent
       strlen(buffer), // Amount of bytes being sent
       0);             // Flags
   memset(buffer, 0, sizeof(buffer));
 
-  close(serverSocket);
+  close(clientSocket);
 }

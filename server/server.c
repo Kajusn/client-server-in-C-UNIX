@@ -18,7 +18,7 @@ void start_server() {
     // Initializing server socket
     serverSocket = socket(
         AF_INET,     // IPv4 internet protocols
-        SOCK_STREAM, // Sequenced, reliable, two-way connection-based byte streams
+        SOCK_STREAM, // Sequenced, reliable, two-way connection-based byte streams /
         0);          // Default protocol
 
     if (serverSocket < 0) {
@@ -28,8 +28,8 @@ void start_server() {
 
     // Initializing server address
     memset(&serverAddress, 0, sizeof(serverAddress));  // Clearing
-    serverAddress.sin_family = AF_INET;                // IPv4
-    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY); // Any address accepted
+    serverAddress.sin_family = AF_INET;                // IPv4 /
+    serverAddress.sin_addr.s_addr = INADDR_ANY; 
     serverAddress.sin_port = htons(SERVER_PORT);       // Accepting port
 
     // Binding server's address to server's socket
@@ -94,7 +94,7 @@ void start_server() {
                 /* Data arriving on an already-connected socket. */
                 clientSocket = i;
                 // Once connection has been received, reading input
-                serverRequestLength = recv(clientSocket, buffer, sizeof(buffer), 0);
+                serverRequestLength = recv(clientSocket, buffer, sizeof(buffer), 0); //
 
                 if (!strncmp(buffer, "disconnect", 10)) 
                 {
